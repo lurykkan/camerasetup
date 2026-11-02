@@ -56,17 +56,17 @@ const $=document.getElementById("a");
 let lens=+(localStorage.getItem("lens")||0),favs=JSON.parse(localStorage.getItem("favs")||"[]"),red=localStorage.getItem("red")=="1",det=false,cur=null;
 const sv=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
 const mx=s=>s.replace("{max}",LENS[lens][1]);
-function top(t,back){return `<div class="bar">${back?'<button onclick="home()">‹</button>':""}<h1>${t}</h1><button class="${red?"on":""}" onclick="rd()">🔴</button></div>`}
+function hd(t,back){return `<div class="bar">${back?'<button onclick="home()">‹</button>':""}<h1>${t}</h1><button class="${red?"on":""}" onclick="rd()">🔴</button></div>`}
 function rd(){red=!red;sv("red",red?1:0);document.body.classList.toggle("red",red);cur?go(cur[0],cur[1]):home()}
 function lensBtns(f){return `<div class="sp">${LENS.map((x,i)=>`<button class="${i==lens?"on":""}" onclick="${f}(${i})">${x[0]} mm</button>`).join("")}</div>`}
 function sl(i){lens=i;sv("lens",i);cur?go(cur[0],cur[1]):home()}
 function card(s){return `<button class="sc" onclick="ask('${s.id}')"><b>${s.i}</b>${s.n}</button>`}
 function home(){cur=null;det=false;const F=S.filter(s=>favs.includes(s.id));
-$.innerHTML=top("Réglages photo")+`<h2>Objectif monté</h2>${lensBtns("sl")}`+(F.length?`<h2>Favoris</h2><div class="grid">${F.map(card).join("")}</div>`:"")+`<h2>Scénarios</h2><div class="grid">${S.map(card).join("")}</div><p class="tip">Canon EOS 80D · points de départ à affiner selon la lumière réelle.</p>`;scrollTo(0,0)}
-function ask(id){const s=S.find(x=>x.id==id);$.innerHTML=top(s.i+" "+s.n,1)+`<h2>${s.q}</h2>`+s.o.map((o,j)=>`<button class="q" onclick="go('${id}',${j})">${o[0]}</button>`).join("");scrollTo(0,0)}
+$.innerHTML=hd("Réglages photo")+`<h2>Objectif monté</h2>${lensBtns("sl")}`+(F.length?`<h2>Favoris</h2><div class="grid">${F.map(card).join("")}</div>`:"")+`<h2>Scénarios</h2><div class="grid">${S.map(card).join("")}</div><p class="tip">Canon EOS 80D · points de départ à affiner selon la lumière réelle.</p>`;scrollTo(0,0)}
+function ask(id){const s=S.find(x=>x.id==id);$.innerHTML=hd(s.i+" "+s.n,1)+`<h2>${s.q}</h2>`+s.o.map((o,j)=>`<button class="q" onclick="go('${id}',${j})">${o[0]}</button>`).join("");scrollTo(0,0)}
 function row(k,v){return `<button class="row" onclick="this.classList.toggle('open')"><small>${LAB[k]}</small><strong>${mx(v)}</strong><div class="bub">${INFO[k]}</div></button>`}
 function go(id,j){cur=[id,j];const s=S.find(x=>x.id==id),o=s.o[j],r=Object.assign({},BASE,o[1]),f=favs.includes(id);
-$.innerHTML=top(s.i+" "+s.n+" · "+o[0],1)+lensBtns("sl")+(s.l!=lens?`<p class="tip">Objectif conseillé : ${LENS[s.l][0]} mm.</p>`:"")+`<div class="why">${o[2]}</div>`+SIM.map(k=>row(k,r[k])).join("")+
+$.innerHTML=hd(s.i+" "+s.n+" · "+o[0],1)+lensBtns("sl")+(s.l!=lens?`<p class="tip">Objectif conseillé : ${LENS[s.l][0]} mm.</p>`:"")+`<div class="why">${o[2]}</div>`+SIM.map(k=>row(k,r[k])).join("")+
 (det?DET.map(k=>row(k,r[k])).join(""):"")+`<div class="sp"><button onclick="det=!det;go('${id}',${j})">${det?"Vue simple":"Vue détaillée"}</button><button class="${f?"on":""}" onclick="fv('${id}')">${f?"★ Favori":"☆ Favori"}</button></div><p class="tip">💡 ${o[3]}</p><p class="tip">Touchez un réglage pour l'explication et le chemin dans les menus.</p>`;scrollTo(0,0)}
 function fv(id){favs=favs.includes(id)?favs.filter(x=>x!=id):favs.concat(id);sv("favs",JSON.stringify(favs));go(cur[0],cur[1])}
 document.body.classList.toggle("red",red);home();
