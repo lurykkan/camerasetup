@@ -62,12 +62,31 @@ function lensBtns(f){return `<div class="sp">${LENS.map((x,i)=>`<button class="$
 function sl(i){lens=i;sv("lens",i);cur?go(cur[0],cur[1]):home()}
 function card(s){return `<button class="sc" onclick="ask('${s.id}')"><b>${s.i}</b>${s.n}</button>`}
 function home(){cur=null;det=false;const F=S.filter(s=>favs.includes(s.id));
-$.innerHTML=hd("Réglages photo")+`<h2>Objectif monté</h2>${lensBtns("sl")}`+(F.length?`<h2>Favoris</h2><div class="grid">${F.map(card).join("")}</div>`:"")+`<h2>Scénarios</h2><div class="grid">${S.map(card).join("")}</div><p class="tip">Canon EOS 80D · points de départ à affiner selon la lumière réelle.</p>`;scrollTo(0,0)}
+$.innerHTML=hd("Réglages photo")+`<h2>Objectif monté</h2>${lensBtns("sl")}`+(F.length?`<h2>Favoris</h2><div class="grid">${F.map(card).join("")}</div>`:"")+`<button class="q" style="margin-top:14px" onclick="tools()">🧰 Outils et carnet</button><h2>Scénarios</h2><div class="grid">${S.map(card).join("")}</div><p class="tip">Canon EOS 80D · points de départ à affiner selon la lumière réelle.</p>`;scrollTo(0,0)}
 function ask(id){const s=S.find(x=>x.id==id);$.innerHTML=hd(s.i+" "+s.n,1)+`<h2>${s.q}</h2>`+s.o.map((o,j)=>`<button class="q" onclick="go('${id}',${j})">${o[0]}</button>`).join("");scrollTo(0,0)}
 function row(k,v){return `<button class="row" onclick="this.classList.toggle('open')"><small>${LAB[k]}</small><strong>${mx(v)}</strong><div class="bub">${INFO[k]}</div></button>`}
-function go(id,j){cur=[id,j];const s=S.find(x=>x.id==id),o=s.o[j],r=Object.assign({},BASE,o[1]),f=favs.includes(id);
+function go(id,j){cur=[id,j];const s=S.find(x=>x.id==id),o=s.o[j],r=Object.assign({},BASE,o[1]),f=favs.includes(id);lastTxt=s.n+" · "+o[0]+" — "+SIM.map(k=>mx(r[k])).join(" | ");
 $.innerHTML=hd(s.i+" "+s.n+" · "+o[0],1)+lensBtns("sl")+(s.l!=lens?`<p class="tip">Objectif conseillé : ${LENS[s.l][0]} mm.</p>`:"")+`<div class="why">${o[2]}</div>`+SIM.map(k=>row(k,r[k])).join("")+
-(det?DET.map(k=>row(k,r[k])).join(""):"")+`<div class="sp"><button onclick="det=!det;go('${id}',${j})">${det?"Vue simple":"Vue détaillée"}</button><button class="${f?"on":""}" onclick="fv('${id}')">${f?"★ Favori":"☆ Favori"}</button></div><p class="tip">💡 ${o[3]}</p><p class="tip">Touchez un réglage pour l'explication et le chemin dans les menus.</p>`;scrollTo(0,0)}
+(det?DET.map(k=>row(k,r[k])).join(""):"")+`<div class="sp"><button onclick="det=!det;go('${id}',${j})">${det?"Vue simple":"Vue détaillée"}</button><button class="${f?"on":""}" onclick="fv('${id}')">${f?"★ Favori":"☆ Favori"}</button><button style="flex:0 0 64px" onclick="nt()">📝</button></div><p class="tip">💡 ${o[3]}</p><p class="tip">Touchez un réglage pour l'explication et le chemin dans les menus.</p>`;scrollTo(0,0)}
 function fv(id){favs=favs.includes(id)?favs.filter(x=>x!=id):favs.concat(id);sv("favs",JSON.stringify(favs));go(cur[0],cur[1])}
+
+let lastTxt="",calc=()=>{};
+const nv=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}};
+const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const g=i=>parseFloat(document.getElementById(i).value.replace(",","."));
+const ft=t=>t<1?"1/"+Math.round(1/t)+" s":t<60?(t<10?t.toFixed(1):Math.round(t))+" s":t<3600?Math.floor(t/60)+" min "+Math.round(t%60)+" s":Math.floor(t/3600)+" h "+Math.round(t%3600/60)+" min";
+const inp=(i,l,v)=>`<label class="tip">${l}<input id="${i}" value="${v}" inputmode="decimal" oninput="calc()"></label>`;
+function tools(){cur=null;$.innerHTML=hd("🧰 Outils",1)+[["hyp","Hyperfocale"],["npf","Étoiles : temps de pose maxi"],["nd","Pose longue avec filtre ND"],["chk","Checklist avant sortie"],["car","Carnet de sortie"]].map(t=>`<button class="q" onclick="${t[0]}()">${t[1]}</button>`).join("");scrollTo(0,0)}
+function tool(t,h,f){$.innerHTML=hd(t,1).replace('home()','tools()')+h+'<div class="why" id="out"></div>';calc=()=>{try{document.getElementById("out").innerHTML=f()}catch(e){document.getElementById("out").textContent="Valeurs invalides"}};calc()}
+function hyp(){tool("Hyperfocale",inp("a","Focale réelle (mm)",18)+inp("b","Ouverture f/",8)+inp("c","Distance de mise au point (m)",3),()=>{const f=g("a"),n=g("b"),s=g("c")*1e3,H=f*f/(n*.019)+f,m=x=>(x/1e3).toFixed(1)+" m";return `Hyperfocale : <b>${m(H)}</b>. Mise au point à cette distance : net de ${m(H/2)} à l'infini.<br>Mise au point à ${m(s)} : net de <b>${m(H*s/(H+s))}</b> à <b>${s>=H?"l'infini":m(H*s/(H-s))}</b>.`})}
+function npf(){tool("Temps de pose maxi (étoiles)",inp("a","Focale réelle (mm)",18)+inp("b","Ouverture f/",3.5),()=>{const f=g("a"),n=g("b");return `Règle NPF (80D, pixels de 3,7 µm) : <b>${Math.round((35*n+30*3.72)/f)} s</b>.<br>Règle des 500 (plus tolérante) : ${Math.round(500/(f*1.6))} s.`})}
+function nd(){tool("Pose longue avec filtre ND",inp("a","Vitesse sans filtre (ex. 1/60 ou 2)","1/60")+`<label class="tip">Filtre<select id="b" onchange="calc()"><option value="3">ND8 (3 stops)</option><option value="6">ND64 (6 stops)</option><option value="10" selected>ND1000 (10 stops)</option><option value="15">ND32000 (15 stops)</option></select></label>`,()=>{const v=document.getElementById("a").value,p=v.split("/"),t=p.length>1?p[0]/p[1]:parseFloat(v.replace(",","."));if(!(t>0))throw 0;const r=t*2**g("b");return `Vitesse avec filtre : <b>${ft(r)}</b>${r>30?"<br>Au-delà de 30 s : mode Bulb (B) et télécommande.":""}`})}
+const CK=["Batterie chargée","Batterie de secours","Carte SD vidée","Objectif nettoyé","Trépied","Télécommande ou retardateur","Filtres (ND, polarisant)","Microfibre","Lampe frontale (rouge)","Vêtements adaptés"];
+function chk(){const c=nv("chk",{});$.innerHTML=hd("Checklist",1).replace('home()','tools()')+CK.map((x,i)=>`<button class="q ${c[i]?"on":""}" onclick="ck(${i})">${c[i]?"✅":"⬜"} ${x}</button>`).join("")+`<button class="q" onclick="sv('chk','{}');chk()">Tout décocher</button>`}
+function ck(i){const c=nv("chk",{});c[i]=!c[i];sv("chk",JSON.stringify(c));chk()}
+function car(){const L=nv("car",[]);$.innerHTML=hd("Carnet",1).replace('home()','tools()')+`<textarea id="t" rows="3" placeholder="Notes de la sortie…"></textarea><button class="q" onclick="ad(document.getElementById('t').value)">Enregistrer</button>`+L.map((e,i)=>`<div class="why"><small>${e[0]}</small><br>${esc(e[1])}<br><button style="min-height:40px;padding:6px 12px;margin-top:8px" onclick="dl(${i})">Supprimer</button></div>`).join("")}
+function ad(x){if(!x.trim())return;const L=nv("car",[]);L.unshift([new Date().toLocaleString("fr-FR"),x]);sv("car",JSON.stringify(L));car()}
+function dl(i){const L=nv("car",[]);L.splice(i,1);sv("car",JSON.stringify(L));car()}
+function nt(){ad(lastTxt)}
 document.body.classList.toggle("red",red);home();
 if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js");
