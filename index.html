@@ -1,0 +1,26 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Réglages"><meta name="theme-color" content="#14171a">
+<link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icons/i180.png">
+<title>Réglages photo</title>
+<style>
+:root{--bg:#14171a;--card:#1f2428;--fg:#ecebe6;--mut:#9aa3a9;--ac:#f0b429;--ln:#2d3439}
+body.red{--bg:#000;--card:#1a0000;--fg:#ff3b30;--mut:#a02820;--ac:#ff3b30;--ln:#3a0a08}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.4 -apple-system,system-ui,sans-serif}
+main{max-width:640px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 14px) 14px calc(env(safe-area-inset-bottom) + 28px)}
+h1{font-size:26px;margin:6px 0 14px}h2{font-size:15px;color:var(--mut);margin:20px 0 8px;font-weight:600}
+.bar{display:flex;gap:8px;align-items:center;margin-bottom:6px}.bar h1{flex:1;margin:0}
+button{font:inherit;color:inherit;background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:14px 16px;min-height:56px}
+button:active{background:var(--ln)}button.on{border-color:var(--ac);color:var(--ac)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sc{display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-height:104px;text-align:left;font-weight:600}.sc b{font-size:34px;line-height:1}
+.q{display:block;width:100%;margin-bottom:10px;text-align:left;font-size:19px}
+.row{display:block;width:100%;text-align:left;margin-bottom:8px;padding:12px 16px}
+.row small{display:block;color:var(--mut);font-size:14px}.row strong{font-size:21px;font-weight:600}
+.bub{display:none;margin-top:8px;padding-top:8px;border-top:1px solid var(--ln);color:var(--mut);font-size:15px}.row.open .bub{display:block}
+.why{background:var(--card);border-left:4px solid var(--ac);padding:12px 14px;border-radius:8px;margin:10px 0}
+.tip{color:var(--mut);font-size:15px;margin:10px 2px}.sp{display:flex;gap:8px}.sp button{flex:1}
+</style></head><body><main id="a"></main><script src="app.js"></script></body></html>
